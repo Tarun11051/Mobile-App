@@ -6,6 +6,7 @@ type DoctorCardProps = {
   doctor: Doctor;
   isDesktopLike?: boolean;
   onPressAvailability?: (doctor: Doctor) => void;
+  showAvailabilityButton?: boolean;
 };
 
 const getExperienceLabel = (experience: Doctor["experience"]) => {
@@ -35,11 +36,15 @@ const getRecommendationLabel = (rating: Doctor["rating"]) => {
   return `${percentage}%`;
 };
 
-export default function Doctorcard({ doctor, isDesktopLike, onPressAvailability }: DoctorCardProps) {
+export default function DoctorCard({
+  doctor,
+  isDesktopLike,
+  onPressAvailability,
+  showAvailabilityButton = true,
+}: DoctorCardProps) {
   const specialization = doctor.specialty ?? "-";
   const rating = doctor.rating ?? "-";
-  const fee =
-    doctor.fee !== undefined && doctor.fee !== null ? `Rs ${doctor.fee}` : "-";
+  const fee = doctor.fee !== undefined && doctor.fee !== null ? `Rs ${doctor.fee}` : "-";
   const experience = getExperienceLabel(doctor.experience);
   const availability = getAvailabilityLabel(doctor);
   const recommendation = getRecommendationLabel(doctor.rating);
@@ -60,17 +65,17 @@ export default function Doctorcard({ doctor, isDesktopLike, onPressAvailability 
           </Text>
           <Text style={[styles.subLine, isDesktopLike && styles.subLineDesktop]}>cuure.health</Text>
 
-          <Text style={[styles.feeLine, isDesktopLike && styles.feeLineDesktop]}>
+          {/* <Text style={[styles.feeLine, isDesktopLike && styles.feeLineDesktop]}>
             <Text style={styles.feeValue}>{fee}</Text>
             <Text style={styles.feeMeta}> consultation fee at clinic</Text>
           </Text>
           <Text style={[styles.availableLine, isDesktopLike && styles.availableLineDesktop]}>
             <Text style={styles.availableLabel}>Available: </Text>
             {availability}
-          </Text>
+          </Text> */}
         </View>
 
-        {isDesktopLike ? (
+        {isDesktopLike && showAvailabilityButton ? (
           <TouchableOpacity
             style={[styles.button, styles.buttonDesktop]}
             onPress={() => onPressAvailability?.(doctor)}
@@ -80,7 +85,7 @@ export default function Doctorcard({ doctor, isDesktopLike, onPressAvailability 
         ) : null}
       </View>
 
-      {!isDesktopLike ? (
+      {!isDesktopLike && showAvailabilityButton ? (
         <TouchableOpacity style={styles.button} onPress={() => onPressAvailability?.(doctor)}>
           <Text style={styles.buttonText}>Check Availability →</Text>
         </TouchableOpacity>
@@ -145,7 +150,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   name: {
-    fontSize: 15,
+    fontSize: 18,
     fontWeight: "700",
     color: "#0F172A",
     lineHeight: 20,
@@ -155,8 +160,8 @@ const styles = StyleSheet.create({
     lineHeight: 31,
   },
   subLine: {
-    marginTop: 3,
-    fontSize: 11,
+    marginTop: 8,
+    fontSize: 15,
     color: "#475569",
   },
   subLineDesktop: {
