@@ -9,7 +9,7 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
-import DoctorCard from "../components/DoctorCard";
+import DoctorCard from "../components/Doctorcard";
 import { sampleDoctors } from "../data/doctors";
 import type { Doctor } from "../data/doctors";
 

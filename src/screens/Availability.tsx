@@ -12,7 +12,7 @@ import {
 import { RouteProp } from "@react-navigation/native";
 import ConsultationModeToggle, { ConsultMode } from "../components/ConsultationMode";
 import DateSelector from "../components/Dateselector";
-import DoctorCard from "../components/DoctorCard";
+import DoctorCard from "../components/Doctorcard";
 import TimeSlotsGrid, { TimeSlot } from "../components/TimeSlot";
 import type { Doctor } from "../data/doctors";
 
