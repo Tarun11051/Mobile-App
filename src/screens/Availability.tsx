@@ -1,7 +1,8 @@
-
 import React, { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
+  Platform,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -16,7 +17,12 @@ import DoctorCard from "../components/Doctorcard";
 import TimeSlotsGrid, { TimeSlot } from "../components/TimeSlot";
 import type { Doctor } from "../data/doctors";
 
-const API_BASE_URL = "http://10.0.2.2:8000";
+// Platform-aware base URL
+const API_BASE_URL =
+  Platform.OS === "android"
+    ? "http://10.0.2.2:8000"
+    : "http://localhost:8000";
+
 const DAYS_TO_SHOW = 7;
 
 const getDateLabel = (date: Date) => {
@@ -36,6 +42,12 @@ const buildUpcomingDates = () => {
 
 const upcomingDates = buildUpcomingDates();
 
+// Temporary patient identity (replace with auth later)
+const CURRENT_PATIENT = {
+  name: "Tarun R",
+  phone: "9999999999",
+};
+
 type AvailabilityRouteParams = {
   AvailabilityDetails: { doctor?: Doctor };
 };
@@ -50,32 +62,30 @@ const DoctorAvailabilityScreen = ({ route }: DoctorAvailabilityScreenProps) => {
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [loadingDoctors, setLoadingDoctors] = useState(false);
+  const [booking, setBooking] = useState(false);
+
   const selectedDoctor = route?.params?.doctor ?? null;
 
-  // Reset slot when user changes date or consultation mode
   useEffect(() => {
     setSelectedSlot(null);
   }, [selectedDateKey, mode]);
 
   useEffect(() => {
     let cancelled = false;
-
     const fetchDoctors = async () => {
       try {
         setLoadingDoctors(true);
-        const response = await fetch(
+        const r = await fetch(
           `${API_BASE_URL}/api/doctors?date=${selectedDateKey}&mode=${encodeURIComponent(mode)}`
         );
-        const payload = await response.json();
-        if (!response.ok) throw new Error("Failed");
-        if (!cancelled) setDoctors(payload.doctors ?? []);
+        const payload = await r.json();
+        if (!cancelled && r.ok) setDoctors(payload.doctors ?? []);
       } catch {
         if (!cancelled) setDoctors([]);
       } finally {
         if (!cancelled) setLoadingDoctors(false);
       }
     };
-
     fetchDoctors();
     return () => {
       cancelled = true;
@@ -91,7 +101,48 @@ const DoctorAvailabilityScreen = ({ route }: DoctorAvailabilityScreenProps) => {
     return selectedSlot ? `${base} • ${selectedSlot.label}` : base;
   }, [mode, selectedDateKey, selectedSlot]);
 
-  const canBook = !!selectedSlot;
+  const canBook = !!selectedDoctor && !!selectedSlot && !booking;
+
+  const notify = (title: string, msg: string) => {
+    if (Platform.OS === "web") {
+      window.alert(`${title}\n\n${msg}`);
+    } else {
+      Alert.alert(title, msg);
+    }
+  };
+
+  const handleBook = async () => {
+    if (!selectedDoctor || !selectedSlot) return;
+    try {
+      setBooking(true);
+      const r = await fetch(`${API_BASE_URL}/api/appointment-requests`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          doctor_id: selectedDoctor.id,
+          patient_name: CURRENT_PATIENT.name,
+          patient_phone: CURRENT_PATIENT.phone,
+          date: selectedDateKey,
+          slot: selectedSlot.label,
+          mode,
+        }),
+      });
+      const data = await r.json();
+      if (!r.ok) {
+        notify("Request failed", data?.detail ?? "Please try again.");
+        return;
+      }
+      notify(
+        "Request sent",
+        `Your appointment request with ${selectedDoctor.name} on ${selectedDateKey} at ${selectedSlot.label} (${mode}) has been created. Ref #${data.id}.`
+      );
+      setSelectedSlot(null);
+    } catch (e: any) {
+      notify("Network error", e?.message ?? "Unable to reach server.");
+    } finally {
+      setBooking(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -119,7 +170,6 @@ const DoctorAvailabilityScreen = ({ route }: DoctorAvailabilityScreenProps) => {
           </View>
         ) : null}
 
-        {/* NEW: available time slots below the doctor card */}
         {selectedDoctor ? (
           <TimeSlotsGrid
             dateKey={selectedDateKey}
@@ -150,8 +200,13 @@ const DoctorAvailabilityScreen = ({ route }: DoctorAvailabilityScreenProps) => {
         <TouchableOpacity
           style={[styles.bookBtn, !canBook && styles.bookBtnDisabled]}
           disabled={!canBook}
+          onPress={handleBook}
         >
-          <Text style={styles.bookBtnText}>Book Appointment</Text>
+          {booking ? (
+            <ActivityIndicator color="#FFFFFF" />
+          ) : (
+            <Text style={styles.bookBtnText}>Book Appointment</Text>
+          )}
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -163,13 +218,10 @@ const styles = StyleSheet.create({
   header: { paddingHorizontal: 16, paddingTop: 10 },
   title: { fontSize: 22, fontWeight: "700", color: "#111827" },
   subtitle: { marginTop: 4, color: "#6B7280", fontSize: 13 },
-
   scroll: { flex: 1 },
   scrollContent: { paddingBottom: 140 },
-
   selectedDoctorBlock: { paddingHorizontal: 16, paddingTop: 20 },
   listItem: { paddingHorizontal: 16, paddingTop: 10 },
-
   feedbackBox: {
     backgroundColor: "#FFFFFF",
     borderRadius: 15,
@@ -182,7 +234,6 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   feedbackText: { color: "#6B7280", fontSize: 13, textAlign: "center" },
-
   bottomBar: {
     position: "absolute",
     left: 0,
@@ -202,6 +253,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 13,
+    minHeight: 48,
   },
   bookBtnDisabled: { backgroundColor: "#93C5FD" },
   bookBtnText: { color: "#FFFFFF", fontWeight: "700", fontSize: 15 },
