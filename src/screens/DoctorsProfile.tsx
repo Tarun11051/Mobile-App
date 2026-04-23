@@ -9,7 +9,7 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
-import DoctorCard from "../components/Doctorcard";
+import Doctorcard from "../components/Doctorcard";
 import { sampleDoctors } from "../data/doctors";
 import type { Doctor } from "../data/doctors";
 
@@ -37,7 +37,7 @@ const DoctorsProfile = ({ navigation }: DoctorsProfileProps) => {
 
   const renderDoctor = ({ item }: { item: Doctor }) => {
     return (
-      <DoctorCard
+      <Doctorcard
         doctor={item}
         isDesktopLike={isDesktopLike}
         onPressAvailability={(doctor) => navigation.navigate("AvailabilityDetails", { doctor })}

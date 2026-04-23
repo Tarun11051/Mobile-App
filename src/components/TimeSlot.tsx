@@ -1,5 +1,3 @@
-
-
 import React, { useMemo, useState } from "react";
 import {
   StyleSheet,
@@ -21,56 +19,44 @@ export type SlotGroup = {
 };
 
 type Props = {
-  dateKey: string;
-  mode: string;
+  slots: TimeSlot[];
   selectedSlotId: string | null;
   onSelectSlot: (slot: TimeSlot | null) => void;
 };
 
 const INITIAL_VISIBLE = 3; // slots shown before "Show more"
 
-/* ---------- Mock generator (deterministic per date + mode) ---------- */
-
-const buildSlots = (
-  startHour: number,
-  endHour: number,
-  prefix: string,
-  seed: number
-): TimeSlot[] => {
-  const out: TimeSlot[] = [];
-  let idx = 0;
-  for (let h = startHour; h < endHour; h++) {
-    [0, 30].forEach((min) => {
-      const hour12 = ((h + 11) % 12) + 1;
-      const ampm = h < 12 ? "AM" : "PM";
-      const label = `${String(hour12).padStart(2, "0")}:${String(min).padStart(2, "0")} ${ampm}`;
-      const available = ((seed + idx * 7) % 5) !== 0;
-      out.push({ id: `${prefix}-${h}-${min}`, label, available });
-      idx++;
-    });
-  }
-  return out;
+const parseHour = (label: string): number => {
+  const match = label.match(/^(\d{1,2}):\d{2}\s?(AM|PM)$/i);
+  if (!match) return 0;
+  const hour = Number(match[1]) % 12;
+  const isPM = match[2].toUpperCase() === "PM";
+  return hour + (isPM ? 12 : 0);
 };
 
-const hashString = (s: string): number => {
-  let h = 0;
-  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
-  return h;
-};
-
-const getMockGroups = (dateKey: string, mode: string): SlotGroup[] => {
-  const seed = hashString(`${dateKey}|${mode}`);
-  return [
-    { title: "Morning",   icon: "☀",  slots: buildSlots(9,  12, "m", seed) },
-    { title: "Afternoon", icon: "🌤", slots: buildSlots(12, 16, "a", seed + 3) },
-    { title: "Evening",   icon: "🌙", slots: buildSlots(16, 20, "e", seed + 7) },
-  ];
+const getSlotGroup = (slot: TimeSlot): { title: string; icon: string } => {
+  const hour24 = parseHour(slot.label);
+  if (hour24 < 12) return { title: "Morning", icon: "☀" };
+  if (hour24 < 17) return { title: "Afternoon", icon: "🌤" };
+  return { title: "Evening", icon: "🌙" };
 };
 
 /* ---------- Component ---------- */
 
-const TimeSlotsGrid = ({ dateKey, mode, selectedSlotId, onSelectSlot }: Props) => {
-  const groups = useMemo(() => getMockGroups(dateKey, mode), [dateKey, mode]);
+const TimeSlotsGrid = ({ slots, selectedSlotId, onSelectSlot }: Props) => {
+  const groups = useMemo(() => {
+    const grouped: Record<string, SlotGroup> = {};
+    slots.forEach((slot) => {
+      const groupMeta = getSlotGroup(slot);
+      if (!grouped[groupMeta.title]) {
+        grouped[groupMeta.title] = { ...groupMeta, slots: [] };
+      }
+      grouped[groupMeta.title].slots.push(slot);
+    });
+    return ["Morning", "Afternoon", "Evening"]
+      .map((title) => grouped[title])
+      .filter(Boolean) as SlotGroup[];
+  }, [slots]);
 
   // track which groups are expanded
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
