@@ -59,7 +59,10 @@ const BookingScreen = ({ route, navigation }: BookingScreenProps) => {
     return `${doctor.name} • ${day}, ${d.getDate()} • ${slotLabel} • ${selectedMode}`;
   }, [doctor.name, dateKey, slotLabel, selectedMode]);
 
-  const feeLabel = useMemo(() => `Rs ${doctor.fee}`, [doctor.fee]);
+  const feeLabel = useMemo(() => {
+    const fee = doctor.fee ?? (doctor as any).consultation_fee ?? (doctor as any).consultationFee ?? (doctor as any).price;
+    return fee !== undefined && fee !== null && fee !== 0 ? `Rs ${fee}` : "Rs N/A";
+  }, [doctor]);
   const nameError = touched.name && !patientName.trim() ? "Name is required" : "";
   const phoneError =
     touched.phone && !isValidPhone(patientPhone) ? "Enter a valid 10-digit phone number" : "";

@@ -47,7 +47,7 @@ export const sampleDoctors: Doctor[] = [
     name: "Dr. Sheryas",
     specialty: "General Physician",
     rating: 4.8,
-    fee: 499,
+    fee: 500,
     experience: {
       years: 4,
       months: 6,
@@ -72,7 +72,7 @@ export const sampleDoctors: Doctor[] = [
     name: "Dr.Rohit",
     specialty: "Dermatologist",
     rating: 4.6,
-    fee: 699,
+    fee: 600,
     experience: {
       years: 2,
       months: 6,
@@ -94,7 +94,7 @@ export const sampleDoctors: Doctor[] = [
     name: "Dr.Bharath",
     specialty: "Dermatologist",
     rating: 4.6,
-    fee: 699,
+    fee: 400,
     experience: {
       years: 10,
       months: 0,
@@ -116,7 +116,7 @@ export const sampleDoctors: Doctor[] = [
     name: "Dr.Chandrashekar",
     specialty: "Cardiologist",
     rating: 4.6,
-    fee: 699,
+    fee: 800,
     experience: {
       years: 8,
       months: 6,
@@ -138,7 +138,7 @@ export const sampleDoctors: Doctor[] = [
     name: "Dr.Soujanya",
     specialty: "General Physician",
     rating: 4.6,
-    fee: 699,
+    fee: 800,
     experience: {
       years: 10,
       months: 6,
@@ -160,7 +160,7 @@ export const sampleDoctors: Doctor[] = [
     name: "Dr.Neah Naidu",
     specialty: "General Physician",
     rating: 4.6,
-    fee: 699,
+    fee: 700,
     experience: {
       years: 12,
       months: 6,
@@ -182,7 +182,7 @@ export const sampleDoctors: Doctor[] = [
     name: "Dr.Hemanth",
     specialty: "General Physician",
     rating: 4.6,
-    fee: 699,
+    fee: 500,
     experience: {
       years: 8,
       months: 6,
@@ -204,7 +204,7 @@ export const sampleDoctors: Doctor[] = [
     name: "Dr.Anudeep",
     specialty: "General Physician",
     rating: 4.6,
-    fee: 699,
+    fee: 600,
     experience: {
       years: 6,
       months: 6,

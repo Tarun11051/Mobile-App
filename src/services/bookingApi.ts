@@ -5,6 +5,7 @@ const API_BASE_URL = Platform.OS === "android" ? "http://10.0.2.2:8000" : "http:
 type BackendDoctor = {
   id: string;
   name: string;
+  fee: number; 
 };
 
 const normalizeName = (value: string) => value.toLowerCase().replace(/[^a-z]/g, "");
