@@ -43,3 +43,5 @@ yarn-error.*
 package-lock.json
 package.json
 
+.venv
+.vscode

@@ -1,5 +1,4 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import GreenScreen from '../screens/GreenScreen';
 import DoctorAvailabilityScreen from '../screens/Availability';
 import DoctorsProfile from '../screens/DoctorsProfile';
 import BookingScreen from '../screens/Booking';
@@ -32,7 +31,7 @@ const AvailabilityStackNavigator = () => {
 export default function ButtonTab () {
     return (
         <Tab.Navigator>
-            <Tab.Screen name="GreenScreen" component={GreenScreen} />
+            
             <Tab.Screen name="Doctors" component={AvailabilityStackNavigator} />
            
         </Tab.Navigator>

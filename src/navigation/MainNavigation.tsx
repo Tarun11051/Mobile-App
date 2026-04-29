@@ -1,21 +1,17 @@
-import { createStackNavigator } from "@react-navigation/stack";
-import GreenScreen from "../screens/GreenScreen";
-import YellowScreen from "../screens/YellowScreen";
-import GoldScreen from "../screens/GoldScreen";
-
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import DoctorAvailabilityScreen from "../screens/Availability";
 
-const Stack = createStackNavigator();
+const Stack = createNativeStackNavigator();
+
 const MainNavigation = () => {
-    return (
-        <Stack.Navigator>
-            <Stack.Screen name="GreenScreen" component={GreenScreen} />
-            <Stack.Screen name="YellowScreen" component={YellowScreen} />
-            <Stack.Screen name="GoldScreen" component={GoldScreen} />
-            
-            <Stack.Screen name="Availability" component={DoctorAvailabilityScreen} />
-        </Stack.Navigator>
-    );
+  return (
+    <Stack.Navigator>
+      <Stack.Screen 
+        name="Availability" 
+        component={DoctorAvailabilityScreen} 
+      />
+    </Stack.Navigator>
+  );
 };
 
 export default MainNavigation;
